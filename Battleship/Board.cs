@@ -108,6 +108,7 @@ namespace Battleship
                 return HitStatus.Missed;
             }       
         }
+
         
         public static bool CheckIfTheGridTaken(int shipCoordinateI, int shipCoordinateJ, string[,] board)
         {
