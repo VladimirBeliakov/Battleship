@@ -182,7 +182,6 @@ namespace Battleship
                     Player.CurrentPlayer.Ship2CoordinateI2 = oldShip2CoordinateI1;
                     Player.CurrentPlayer.Ship2CoordinateJ2 = oldShip2CoordinateJ1;
                 }
-
                 
                 else
                 {
