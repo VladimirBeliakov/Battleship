@@ -43,8 +43,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AIPlayer.cs" />
+    <Compile Include="Board.cs" />
+    <Compile Include="GameEngine.cs" />
+    <Compile Include="GameScenario.cs" />
+    <Compile Include="GridProperties.cs" />
+    <Compile Include="HitStatus.cs" />
+    <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RealPlayer.cs" />
+    <Compile Include="Ship.cs" />
+    <Compile Include="StartNewGame.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
