@@ -110,11 +110,11 @@ namespace Battleship
                 }
 
                 // An option to play without moving the ships.
-                //else if (result == HitStatus.Repeat)
-                //{
-                //    if (_currentPlayer.GetType() == player1.GetType()) Console.WriteLine("This grid has already been hit. Please enter different coordinates.");
-                //    continue;
-                //}
+                else if (result == HitStatus.Repeat)
+                {
+                    if (_currentPlayer.GetType() == player1.GetType()) Console.WriteLine("This grid has already been hit. Please enter different coordinates.");
+                    continue;
+                }
                 else
                 {
                     if (_currentPlayer.GetType() == player1.GetType()) Console.WriteLine("You missed.");
@@ -127,7 +127,7 @@ namespace Battleship
                     winner = _currentPlayer == player1 ? "Player 1" : "Player 2";
                 }
 
-                Board.MoveTheShip(numberOfGrids, board, random, _currentPlayer);
+                //Board.MoveTheShip(numberOfGrids, board, random, _currentPlayer);
 
                 _nextPlayer = _currentPlayer;
                 _currentPlayer = _currentPlayer == player1 ? player2 : player1;

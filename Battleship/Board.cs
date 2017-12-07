@@ -53,8 +53,8 @@ namespace Battleship
             }
 
             // An option to play without moving the ships.
-            //else if (board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] == GridProperties.O1.ToString() ||
-            //         board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] == GridProperties.X1.ToString()) return HitStatus.Repeat;
+            else if (board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] == GridProperties.O1.ToString() ||
+                     board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] == GridProperties.X1.ToString()) return HitStatus.Repeat;
 
             else
             {
