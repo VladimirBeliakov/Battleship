@@ -64,28 +64,31 @@ namespace Battleship
                 break;
             }
 
-            //int Ship1CoordinateI = 0;
-            //int Ship1CoordinateJ = 0;
+            Random random = new Random();
 
-            //int Ship2CoordinateI1 = 0;
-            //int Ship2CoordinateJ1 = 0;
-            //int Ship2CoordinateI2 = 0;
-            //int Ship2CoordinateJ2 = 0;
+            IPlayer player1;
+            IPlayer player2;
 
-            //Ship ship1 = new Ship(Ship1CoordinateI, Ship1CoordinateJ);
-            //Ship ship2 = new Ship(Ship2CoordinateI1, Ship2CoordinateJ1, Ship2CoordinateI2, Ship2CoordinateJ2);
+            if (StartNewGame.GameMode == GameScenario.RealVsAI)
+            {
+                player1 = new RealPlayer();
+                player2 = new AIPlayer();
+            }
 
-            Player player1 = new RealPlayer();
-            Player player2;
+            else
+            {
+                player1 = new RealPlayer();
+                player2 = new RealPlayer();
+            }
 
-            if (StartNewGame.GameMode == GameScenario.RealVsAI) player2 = new AIPlayer();
-            else player2 = new RealPlayer();
+            GameVisualisation gameVisualisation = new GameVisualisation();
+            GameEngine gameEngine = new GameEngine(gameVisualisation);
 
-            StartNewGame.NewGame(player1, player2, BattleshipBoard);
+            StartNewGame.NewGame(player1, player2, BattleshipBoard, gameVisualisation);
 
-            GameEngine.PlayingTheGame(player1, player2, BattleshipBoard, numberOfGrids);
+            string winner = gameEngine.PlayingTheGame(player1, player2, BattleshipBoard, numberOfGrids, random);
 
-            Console.WriteLine($"The Winner is {Board.Winner}!");
+            Console.WriteLine($"The Winner is {winner}!");
 
             Console.ReadLine();
         }

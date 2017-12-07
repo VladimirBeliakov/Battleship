@@ -9,52 +9,6 @@ namespace Battleship
 {
     class Board
     {
-        public static string CurrentPlayerOverWrittenSymmbolShip1 { get; set; }
-        public static string CurrentPlayerOverWrittenSymmbolShip2S1 { get; set; }
-        public static string CurrentPlayerOverWrittenSymmbolShip2S2 { get; set; }
-
-        public static string NextPlayerOverWrittenSymmbolShip1 { get; set; }
-        public static string NextPlayerOverWrittenSymmbolShip2S1 { get; set; }
-        public static string NextPlayerOverWrittenSymmbolShip2S2 { get; set; }
-
-        public static string Winner { get; set; }
-
-        public static void InitializeOrPrintBoard(string[,] board)
-        {
-            for (int i = 0; i < board.GetLength(0); i++)
-            {
-                for (int j = 0; j < board.GetLength(0); j++)
-                {
-                    if (board[i, j] == null)
-                    {
-                        board[i, j] = GridProperties.M1.ToString();
-                        Console.Write(board[i, j]);
-                    }
-
-                    else
-                    {
-                        if (board[i, j] == Player.NextPlayer.symbol1 || 
-                            board[i, j] == Player.NextPlayer.symbol2 || 
-                            board[i, j] == Player.NextPlayer.symbol3)
-                        {
-                            if (board[i, j] == Player.NextPlayer.symbol1) Console.Write(NextPlayerOverWrittenSymmbolShip1);
-                            if (board[i, j] == Player.NextPlayer.symbol2) Console.Write(NextPlayerOverWrittenSymmbolShip2S1);
-                            if (board[i, j] == Player.NextPlayer.symbol3) Console.Write(NextPlayerOverWrittenSymmbolShip2S2);
-                        }
-                        else if (board[i, j] == Player.CurrentPlayer.symbol1) Console.Write(Player.CurrentPlayer.symbol1);
-        
-                        else if (board[i, j] == Player.CurrentPlayer.symbol2) Console.Write(Player.CurrentPlayer.symbol2);
-
-                        else if (board[i, j] == Player.CurrentPlayer.symbol3) Console.Write(Player.CurrentPlayer.symbol3);
-
-                        else Console.Write(board[i, j]);
-                    }
-                    if (j == board.GetLength(0) - 1) Console.WriteLine();
-                }
-            }
-            Console.WriteLine();
-        }
-
         public static bool CheckIfOutOfRange(int shipCoordinateI, int shipCoordinateJ, string[,] board)
         {
             return shipCoordinateI > board.GetLength(0) - 1 ||
@@ -71,40 +25,40 @@ namespace Battleship
                    shipCoordinateJ2 > board.GetLength(0) - 1 || shipCoordinateJ2 < 0 ? true : false;
         }
 
-        public static HitStatus CheckIfHitTheShip(string[,] board)
+        public static HitStatus CheckIfHitTheShip(string[,] board, IPlayer currentPlayer, IPlayer nextPlayer)
         {
-            if (board[Player.CurrentPlayer.HitCoordinateI, Player.CurrentPlayer.HitCoordinateJ] == Player.CurrentPlayer.symbol1 ||
-                board[Player.CurrentPlayer.HitCoordinateI, Player.CurrentPlayer.HitCoordinateJ] == Player.CurrentPlayer.symbol2 ||
-                board[Player.CurrentPlayer.HitCoordinateI, Player.CurrentPlayer.HitCoordinateJ] == Player.CurrentPlayer.symbol3) return HitStatus.Own;
+            if (board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] == currentPlayer.symbol1 ||
+                board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] == currentPlayer.symbol2 ||
+                board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] == currentPlayer.symbol3) return HitStatus.Own;
 
-            else if (board[Player.CurrentPlayer.HitCoordinateI, Player.CurrentPlayer.HitCoordinateJ] == Player.NextPlayer.symbol1)
+            else if (board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] == nextPlayer.symbol1)
             {
-                board[Player.CurrentPlayer.HitCoordinateI, Player.CurrentPlayer.HitCoordinateJ] = GridProperties.X1.ToString();
-                Player.NextPlayer.Ship1Settled += 1;
+                board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] = GridProperties.X1.ToString();
+                nextPlayer.Ship1Settled += 1;
                 return HitStatus.Hit;
             }
 
-            else if (board[Player.CurrentPlayer.HitCoordinateI, Player.CurrentPlayer.HitCoordinateJ] == Player.NextPlayer.symbol2)
+            else if (board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] == nextPlayer.symbol2)
             {
-                board[Player.CurrentPlayer.HitCoordinateI, Player.CurrentPlayer.HitCoordinateJ] = GridProperties.X1.ToString();
-                Player.NextPlayer.Ship2_1_Settled += 1;
+                board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] = GridProperties.X1.ToString();
+                nextPlayer.Ship2_1_Settled += 1;
                 return HitStatus.HalfHit;
             }
 
-            else if (board[Player.CurrentPlayer.HitCoordinateI, Player.CurrentPlayer.HitCoordinateJ] == Player.NextPlayer.symbol3)
+            else if (board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] == nextPlayer.symbol3)
             {
-                board[Player.CurrentPlayer.HitCoordinateI, Player.CurrentPlayer.HitCoordinateJ] = GridProperties.X1.ToString();
-                Player.NextPlayer.Ship2_2_Settled += 1;
+                board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] = GridProperties.X1.ToString();
+                nextPlayer.Ship2_2_Settled += 1;
                 return HitStatus.HalfHit;
             }
 
             // An option to play without moving the ships.
-            //else if (board[Player.CurrentPlayer.HitCoordinateI, Player.CurrentPlayer.HitCoordinateJ] == GridProperties.O1.ToString() ||
-            //         board[Player.CurrentPlayer.HitCoordinateI, Player.CurrentPlayer.HitCoordinateJ] == GridProperties.X1.ToString()) return HitStatus.Repeat;
+            //else if (board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] == GridProperties.O1.ToString() ||
+            //         board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] == GridProperties.X1.ToString()) return HitStatus.Repeat;
 
             else
             {
-                board[Player.CurrentPlayer.HitCoordinateI, Player.CurrentPlayer.HitCoordinateJ] = GridProperties.O1.ToString();
+                board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] = GridProperties.O1.ToString();
                 return HitStatus.Missed;
             }       
         }
@@ -123,123 +77,121 @@ namespace Battleship
         }
 
 
-        public static void MoveTheShip(int numberOfGrids, string[,] board)
+        public static void MoveTheShip(int numberOfGrids, string[,] board, Random random, IPlayer currentPlayer)
         {
-            Random random = new Random();
-
-            if (Player.CurrentPlayer.Ship1Settled == 0 &&
-                CheckIfMovingPossible(Player.CurrentPlayer.Ship1CoordinateI, Player.CurrentPlayer.Ship1CoordinateJ, board) == true)
+            if (currentPlayer.Ship1Settled == 0 &&
+                CheckIfMovingPossible(currentPlayer.Ship1CoordinateI, currentPlayer.Ship1CoordinateJ, board) == true)
             {
                 int[] arrayShip1 = new int[2];
 
-                arrayShip1 = MoveOneSectionOfTheShip(Player.CurrentPlayer.Ship1CoordinateI, 
-                                                     Player.CurrentPlayer.Ship1CoordinateJ, board, random);
+                arrayShip1 = MoveOneSectionOfTheShip(currentPlayer.Ship1CoordinateI, 
+                                                     currentPlayer.Ship1CoordinateJ, board, random);
 
-                board[Player.CurrentPlayer.Ship1CoordinateI, Player.CurrentPlayer.Ship1CoordinateJ] = CurrentPlayerOverWrittenSymmbolShip1;
+                board[currentPlayer.Ship1CoordinateI, currentPlayer.Ship1CoordinateJ] = currentPlayer.OverWrittenSymmbolShip1;
 
-                CurrentPlayerOverWrittenSymmbolShip1 = board[arrayShip1[0], arrayShip1[1]];
+                currentPlayer.OverWrittenSymmbolShip1 = board[arrayShip1[0], arrayShip1[1]];
 
-                board[arrayShip1[0], arrayShip1[1]] = Player.CurrentPlayer.symbol1;
+                board[arrayShip1[0], arrayShip1[1]] = currentPlayer.symbol1;
 
-                Player.CurrentPlayer.Ship1CoordinateI = arrayShip1[0];
-                Player.CurrentPlayer.Ship1CoordinateJ = arrayShip1[1];
+                currentPlayer.Ship1CoordinateI = arrayShip1[0];
+                currentPlayer.Ship1CoordinateJ = arrayShip1[1];
             }
 
             // The case when neither section of the second ship has been hit.
-            if (Player.CurrentPlayer.Ship2_1_Settled == 0 && Player.CurrentPlayer.Ship2_2_Settled == 0 &&
-               (CheckIfMovingPossible(Player.CurrentPlayer.Ship2CoordinateI1, Player.CurrentPlayer.Ship2CoordinateJ1, board) == true ||
-                CheckIfMovingPossible(Player.CurrentPlayer.Ship2CoordinateI2, Player.CurrentPlayer.Ship2CoordinateJ2, board) == true))
+            if (currentPlayer.Ship2_1_Settled == 0 && currentPlayer.Ship2_2_Settled == 0 &&
+               (CheckIfMovingPossible(currentPlayer.Ship2CoordinateI1, currentPlayer.Ship2CoordinateJ1, board) == true ||
+                CheckIfMovingPossible(currentPlayer.Ship2CoordinateI2, currentPlayer.Ship2CoordinateJ2, board) == true))
             {
-                int oldShip2CoordinateI1 = Player.CurrentPlayer.Ship2CoordinateI1;
-                int oldShip2CoordinateJ1 = Player.CurrentPlayer.Ship2CoordinateJ1;
+                int oldShip2CoordinateI1 = currentPlayer.Ship2CoordinateI1;
+                int oldShip2CoordinateJ1 = currentPlayer.Ship2CoordinateJ1;
 
                 int[] arrayShip2_1_Case1 = new int[2];
 
-                arrayShip2_1_Case1 = MoveOneSectionOfTheShip(Player.CurrentPlayer.Ship2CoordinateI1,
-                                                             Player.CurrentPlayer.Ship2CoordinateJ1,
-                                                             Player.CurrentPlayer.Ship2CoordinateI2,
-                                                             Player.CurrentPlayer.Ship2CoordinateJ2, board, random);
+                arrayShip2_1_Case1 = MoveOneSectionOfTheShip(currentPlayer.Ship2CoordinateI1,
+                                                             currentPlayer.Ship2CoordinateJ1,
+                                                             currentPlayer.Ship2CoordinateI2,
+                                                             currentPlayer.Ship2CoordinateJ2, board, random);
 
-                board[Player.CurrentPlayer.Ship2CoordinateI1, Player.CurrentPlayer.Ship2CoordinateJ1] = CurrentPlayerOverWrittenSymmbolShip2S1;
-                board[Player.CurrentPlayer.Ship2CoordinateI2, Player.CurrentPlayer.Ship2CoordinateJ2] = CurrentPlayerOverWrittenSymmbolShip2S2;
+                board[currentPlayer.Ship2CoordinateI1, currentPlayer.Ship2CoordinateJ1] = currentPlayer.OverWrittenSymmbolShip2S1;
+                board[currentPlayer.Ship2CoordinateI2, currentPlayer.Ship2CoordinateJ2] = currentPlayer.OverWrittenSymmbolShip2S2;
 
-                CurrentPlayerOverWrittenSymmbolShip2S1 = board[arrayShip2_1_Case1[0], arrayShip2_1_Case1[1]];
+                currentPlayer.OverWrittenSymmbolShip2S1 = board[arrayShip2_1_Case1[0], arrayShip2_1_Case1[1]];
 
-                board[arrayShip2_1_Case1[0], arrayShip2_1_Case1[1]] = Player.CurrentPlayer.symbol2;
+                board[arrayShip2_1_Case1[0], arrayShip2_1_Case1[1]] = currentPlayer.symbol2;
 
-                Player.CurrentPlayer.Ship2CoordinateI1 = arrayShip2_1_Case1[0];
-                Player.CurrentPlayer.Ship2CoordinateJ1 = arrayShip2_1_Case1[1];
+                currentPlayer.Ship2CoordinateI1 = arrayShip2_1_Case1[0];
+                currentPlayer.Ship2CoordinateJ1 = arrayShip2_1_Case1[1];
 
                 // Checking of the first section of the second ship is done.
 
-                if (Player.CurrentPlayer.Ship2CoordinateI1 != Player.CurrentPlayer.Ship2CoordinateI2 ||
-                    Player.CurrentPlayer.Ship2CoordinateJ1 != Player.CurrentPlayer.Ship2CoordinateJ2)
+                if (currentPlayer.Ship2CoordinateI1 != currentPlayer.Ship2CoordinateI2 ||
+                    currentPlayer.Ship2CoordinateJ1 != currentPlayer.Ship2CoordinateJ2)
                 {
-                    CurrentPlayerOverWrittenSymmbolShip2S2 = board[oldShip2CoordinateI1, oldShip2CoordinateJ1];
+                    currentPlayer.OverWrittenSymmbolShip2S2 = board[oldShip2CoordinateI1, oldShip2CoordinateJ1];
 
-                    board[oldShip2CoordinateI1, oldShip2CoordinateJ1] = Player.CurrentPlayer.symbol3;
+                    board[oldShip2CoordinateI1, oldShip2CoordinateJ1] = currentPlayer.symbol3;
 
-                    Player.CurrentPlayer.Ship2CoordinateI2 = oldShip2CoordinateI1;
-                    Player.CurrentPlayer.Ship2CoordinateJ2 = oldShip2CoordinateJ1;
+                    currentPlayer.Ship2CoordinateI2 = oldShip2CoordinateI1;
+                    currentPlayer.Ship2CoordinateJ2 = oldShip2CoordinateJ1;
                 }
                 
                 else
                 {
                     int[] arrayShip2_2_Case1 = new int[2];
 
-                    arrayShip2_2_Case1 = MoveOneSectionOfTheShip(Player.CurrentPlayer.Ship2CoordinateI2,
-                                                                 Player.CurrentPlayer.Ship2CoordinateJ2,
+                    arrayShip2_2_Case1 = MoveOneSectionOfTheShip(currentPlayer.Ship2CoordinateI2,
+                                                                 currentPlayer.Ship2CoordinateJ2,
                                                                  oldShip2CoordinateI1,
                                                                  oldShip2CoordinateJ1, board, random);
 
-                    CurrentPlayerOverWrittenSymmbolShip2S2 = board[arrayShip2_2_Case1[0], arrayShip2_2_Case1[1]];
+                    currentPlayer.OverWrittenSymmbolShip2S2 = board[arrayShip2_2_Case1[0], arrayShip2_2_Case1[1]];
 
-                    board[arrayShip2_2_Case1[0], arrayShip2_2_Case1[1]] = Player.CurrentPlayer.symbol3;
+                    board[arrayShip2_2_Case1[0], arrayShip2_2_Case1[1]] = currentPlayer.symbol3;
 
-                    Player.CurrentPlayer.Ship2CoordinateI2 = arrayShip2_2_Case1[0];
-                    Player.CurrentPlayer.Ship2CoordinateJ2 = arrayShip2_2_Case1[1];
+                    currentPlayer.Ship2CoordinateI2 = arrayShip2_2_Case1[0];
+                    currentPlayer.Ship2CoordinateJ2 = arrayShip2_2_Case1[1];
                 }
             }
 
             // The case when one of the sections of the second ship has been hit.
             else
             {
-                if (Player.CurrentPlayer.Ship2_1_Settled == 0 &&
-                    CheckIfMovingPossible(Player.CurrentPlayer.Ship2CoordinateI1, 
-                                          Player.CurrentPlayer.Ship2CoordinateJ1, board) == true)
+                if (currentPlayer.Ship2_1_Settled == 0 &&
+                    CheckIfMovingPossible(currentPlayer.Ship2CoordinateI1, 
+                                          currentPlayer.Ship2CoordinateJ1, board) == true)
                 {
                     int[] arrayShip2_1_Case2 = new int[2];
 
-                    arrayShip2_1_Case2 = MoveOneSectionOfTheShip(Player.CurrentPlayer.Ship2CoordinateI1, 
-                                                                 Player.CurrentPlayer.Ship2CoordinateJ1, board, random);
+                    arrayShip2_1_Case2 = MoveOneSectionOfTheShip(currentPlayer.Ship2CoordinateI1, 
+                                                                 currentPlayer.Ship2CoordinateJ1, board, random);
 
-                    board[Player.CurrentPlayer.Ship2CoordinateI1, Player.CurrentPlayer.Ship2CoordinateJ1] = CurrentPlayerOverWrittenSymmbolShip2S1;
+                    board[currentPlayer.Ship2CoordinateI1, currentPlayer.Ship2CoordinateJ1] = currentPlayer.OverWrittenSymmbolShip2S1;
 
-                    CurrentPlayerOverWrittenSymmbolShip2S1 = board[arrayShip2_1_Case2[0], arrayShip2_1_Case2[1]];
+                    currentPlayer.OverWrittenSymmbolShip2S1 = board[arrayShip2_1_Case2[0], arrayShip2_1_Case2[1]];
 
-                    board[arrayShip2_1_Case2[0], arrayShip2_1_Case2[1]] = Player.CurrentPlayer.symbol2;
+                    board[arrayShip2_1_Case2[0], arrayShip2_1_Case2[1]] = currentPlayer.symbol2;
 
-                    Player.CurrentPlayer.Ship2CoordinateI1 = arrayShip2_1_Case2[0];
-                    Player.CurrentPlayer.Ship2CoordinateJ1 = arrayShip2_1_Case2[1];
+                    currentPlayer.Ship2CoordinateI1 = arrayShip2_1_Case2[0];
+                    currentPlayer.Ship2CoordinateJ1 = arrayShip2_1_Case2[1];
                 }
 
-                else if (Player.CurrentPlayer.Ship2_2_Settled == 0 &&
-                         CheckIfMovingPossible(Player.CurrentPlayer.Ship2CoordinateI2, 
-                                               Player.CurrentPlayer.Ship2CoordinateJ2, board) == true)
+                else if (currentPlayer.Ship2_2_Settled == 0 &&
+                         CheckIfMovingPossible(currentPlayer.Ship2CoordinateI2, 
+                                               currentPlayer.Ship2CoordinateJ2, board) == true)
                 {
                     int[] arrayShip2_2_Case2 = new int[2];
 
-                    arrayShip2_2_Case2 = MoveOneSectionOfTheShip(Player.CurrentPlayer.Ship2CoordinateI2, 
-                                                                 Player.CurrentPlayer.Ship2CoordinateJ2, board, random);
+                    arrayShip2_2_Case2 = MoveOneSectionOfTheShip(currentPlayer.Ship2CoordinateI2, 
+                                                                 currentPlayer.Ship2CoordinateJ2, board, random);
 
-                    board[Player.CurrentPlayer.Ship2CoordinateI2, Player.CurrentPlayer.Ship2CoordinateJ2] = CurrentPlayerOverWrittenSymmbolShip2S2;
+                    board[currentPlayer.Ship2CoordinateI2, currentPlayer.Ship2CoordinateJ2] = currentPlayer.OverWrittenSymmbolShip2S2;
 
-                    CurrentPlayerOverWrittenSymmbolShip2S2 = board[arrayShip2_2_Case2[0], arrayShip2_2_Case2[1]];
+                    currentPlayer.OverWrittenSymmbolShip2S2 = board[arrayShip2_2_Case2[0], arrayShip2_2_Case2[1]];
 
-                    board[arrayShip2_2_Case2[0], arrayShip2_2_Case2[1]] = Player.CurrentPlayer.symbol3;
+                    board[arrayShip2_2_Case2[0], arrayShip2_2_Case2[1]] = currentPlayer.symbol3;
 
-                    Player.CurrentPlayer.Ship2CoordinateI2 = arrayShip2_2_Case2[0];
-                    Player.CurrentPlayer.Ship2CoordinateJ2 = arrayShip2_2_Case2[1];
+                    currentPlayer.Ship2CoordinateI2 = arrayShip2_2_Case2[0];
+                    currentPlayer.Ship2CoordinateJ2 = arrayShip2_2_Case2[1];
                 }
             }
         }
@@ -317,24 +269,6 @@ namespace Battleship
             if (CheckIfOutOfRange(I3, J2, board) == false && CheckIfTheGridTaken(I3, J2, board) == false) return true;
             if (CheckIfOutOfRange(I2, J1, board) == false && CheckIfTheGridTaken(I2, J1, board) == false) return true;
             else return false;
-        }
-
-        
-        public static void FlipOverWrittenSymmbol()
-        {
-            string temporaryVariable;
-
-            temporaryVariable = CurrentPlayerOverWrittenSymmbolShip1;
-            CurrentPlayerOverWrittenSymmbolShip1 = NextPlayerOverWrittenSymmbolShip1;
-            NextPlayerOverWrittenSymmbolShip1 = temporaryVariable;
-
-            temporaryVariable = CurrentPlayerOverWrittenSymmbolShip2S1;
-            CurrentPlayerOverWrittenSymmbolShip2S1 = NextPlayerOverWrittenSymmbolShip2S1;
-            NextPlayerOverWrittenSymmbolShip2S1 = temporaryVariable;
-
-            temporaryVariable = CurrentPlayerOverWrittenSymmbolShip2S2;
-            CurrentPlayerOverWrittenSymmbolShip2S2 = NextPlayerOverWrittenSymmbolShip2S2;
-            NextPlayerOverWrittenSymmbolShip2S2 = temporaryVariable;
         }
     }
 }

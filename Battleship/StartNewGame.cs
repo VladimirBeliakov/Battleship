@@ -10,26 +10,34 @@ namespace Battleship
     {
         public static GameScenario GameMode { get; set; }
 
-        public static void NewGame(Player player1, Player player2, string[,] board)
+        public static void NewGame(IPlayer player1, IPlayer player2, string[,] board, GameVisualisation gameVisualisation)
         {
-            Player.AssignPlayers(player1, player2);
-            Player.CurrentPlayer = player1;
-            Player.NextPlayer = player2;
+            AssignPlayers(player1, player2);
             Array.Clear(board, 0, board.Length);
-            Board.InitializeOrPrintBoard(board);
-            Board.CurrentPlayerOverWrittenSymmbolShip1 = GridProperties.M1.ToString();
-            Board.CurrentPlayerOverWrittenSymmbolShip2S1 = GridProperties.M1.ToString();
-            Board.CurrentPlayerOverWrittenSymmbolShip2S2 = GridProperties.M1.ToString();
-            Board.NextPlayerOverWrittenSymmbolShip1 = GridProperties.M1.ToString();
-            Board.NextPlayerOverWrittenSymmbolShip2S1 = GridProperties.M1.ToString();
-            Board.NextPlayerOverWrittenSymmbolShip2S2 = GridProperties.M1.ToString();
+            gameVisualisation.InitializeOrPrintBoard(board, player1, player2);
+            player1.OverWrittenSymmbolShip1 = GridProperties.M1.ToString();
+            player1.OverWrittenSymmbolShip2S1 = GridProperties.M1.ToString();
+            player1.OverWrittenSymmbolShip2S2 = GridProperties.M1.ToString();
+            player2.OverWrittenSymmbolShip1 = GridProperties.M1.ToString();
+            player2.OverWrittenSymmbolShip2S1 = GridProperties.M1.ToString();
+            player2.OverWrittenSymmbolShip2S2 = GridProperties.M1.ToString();
         }
 
-        public static bool CheckTheWinner()
+        public static bool CheckTheWinner(IPlayer nextPlayer)
         {
-            return Player.NextPlayer.Ship1Settled == 1 && 
-                   Player.NextPlayer.Ship2_1_Settled == 1 &&
-                   Player.NextPlayer.Ship2_2_Settled == 1 ? true : false;
+            return nextPlayer.Ship1Settled == 1 &&
+                   nextPlayer.Ship2_1_Settled == 1 &&
+                   nextPlayer.Ship2_2_Settled == 1 ? true : false;
+        }
+
+        private static void AssignPlayers(IPlayer player1, IPlayer player2)
+        {
+            player1.symbol1 = GridProperties.S1.ToString();
+            player1.symbol2 = GridProperties.S2.ToString();
+            player1.symbol3 = GridProperties.S3.ToString();
+            player2.symbol1 = GridProperties.S4.ToString();
+            player2.symbol2 = GridProperties.S5.ToString();
+            player2.symbol3 = GridProperties.S6.ToString();
         }
     }
 }
