@@ -8,19 +8,13 @@ namespace Battleship
 {
     class GameEngine
     {
-        private IPlayer _currentPlayer;
-        private IPlayer _nextPlayer;
+        private static Player _currentPlayer;
+        private static Player _nextPlayer;
 
-        private GameVisualisation _gameVisualisation;
-
-        public GameEngine(GameVisualisation gameVisualisation)
+        public static string PlayingTheGame(Player player1, Player player2, string[,] board)
         {
-            _gameVisualisation = gameVisualisation;
-        }
+            Random random = new Random();
 
-
-        public string PlayingTheGame(IPlayer player1, IPlayer player2, string[,] board, int numberOfGrids, Random random)
-        {
             int number = 0;
 
             _currentPlayer = player1;
@@ -33,27 +27,27 @@ namespace Battleship
             while (number < 3)
             {
                 //The players set their ships on the board
+
                 number = _currentPlayer == player1 ? 1 : 2;
 
                 if (_currentPlayer.GetType() == player1.GetType())
-                _gameVisualisation.InitializeOrPrintBoard(board, _currentPlayer, _nextPlayer);
+                GameVisualisation.PrintBoard(board, _currentPlayer, _nextPlayer);
 
-                _currentPlayer.PutTheShipOnTheBoard(numberOfGrids, number, board);
+                _currentPlayer.PutTheShipOnTheBoard(number, board);
 
-                if (number == 2 && (Board.CheckIfTheGridTaken(_currentPlayer.Ship1CoordinateI, _currentPlayer.Ship1CoordinateJ, board) == true ||
-                                    Board.CheckIfTheGridTaken(_currentPlayer.Ship2CoordinateI1, _currentPlayer.Ship2CoordinateJ1,
-                                              _currentPlayer.Ship2CoordinateI2, _currentPlayer.Ship2CoordinateJ2, board) == true))
+                if (number == 2 && (Board.CheckIfTheGridTaken(_currentPlayer.ships, board)))
                 {
                     Console.WriteLine("The ships are on the same grid. Please enter the coordinates again.");
-                    StartNewGame.NewGame(player1, player2, board, _gameVisualisation);
+                    StartNewGame.CreateNewPlayers(player1, player2);
                     _currentPlayer = player1;
                     _nextPlayer = player2;
                     continue;
                 }
 
-                board[_currentPlayer.Ship1CoordinateI, _currentPlayer.Ship1CoordinateJ] = _currentPlayer.symbol1;
-                board[_currentPlayer.Ship2CoordinateI1, _currentPlayer.Ship2CoordinateJ1] = _currentPlayer.symbol2;
-                board[_currentPlayer.Ship2CoordinateI2, _currentPlayer.Ship2CoordinateJ2] = _currentPlayer.symbol3;
+                foreach (Ship ship in _currentPlayer.ships)
+                {
+                    board[ship.I, ship.J] = ship.Symbol;
+                }
 
                 _nextPlayer = _currentPlayer;
                 _currentPlayer = _currentPlayer == player1 ? player2 : player1;
@@ -67,67 +61,33 @@ namespace Battleship
 
             while (winner == null)
             {
-                number = _currentPlayer == player1 ? 1 : 2;
-
                 //The beginning of the game
 
+                number = _currentPlayer == player1 ? 1 : 2;
+
                 if (_currentPlayer.GetType() == player1.GetType())
-                _gameVisualisation.InitializeOrPrintBoard(board, _currentPlayer, _nextPlayer);
+                GameVisualisation.PrintBoard(board, _currentPlayer, _nextPlayer);
 
-                _currentPlayer.HitTheBoard(numberOfGrids, number, board);
+                _currentPlayer.HitTheBoard(number, board);
        
-                HitStatus result = Board.CheckIfHitTheShip(board, _currentPlayer, _nextPlayer);
+                Ship result = Board.CheckIfHitTheShip(board, _currentPlayer, _nextPlayer);
 
-                if (result == HitStatus.Own)
+                if (_currentPlayer.ships.Contains(result))
                 {
                     if (_currentPlayer.GetType() == player1.GetType())
                     {
                         Console.WriteLine("This is your ship. Please choose different coordinates.");
                         Console.WriteLine();
                     }
+                    //I need to check if continue works at any case.
                     continue;
                 }
 
-                else if (result == HitStatus.Hit)
-                {
-                    if (_currentPlayer.GetType() == player1.GetType())
-                    Console.WriteLine("Congratulations! You've settled the ship!!!");
+                Ship.AnalyseTheResult(_currentPlayer, _nextPlayer, result, player1);
 
-                    else Console.WriteLine("Your ship's been settled.");
-                }
-                else if (result == HitStatus.HalfHit)
-                {
-                    if (_currentPlayer.GetType() == player1.GetType()) Console.WriteLine("Congratulations! You've hit the ship!!!");
+                if (StartNewGame.CheckTheWinner(_nextPlayer)) winner = _currentPlayer == player1 ? "Player 1" : "Player 2";
 
-                    else Console.WriteLine("Your ship's been hit.");
-
-                    if (_nextPlayer.Ship2_1_Settled == 1 && _nextPlayer.Ship2_2_Settled == 1)
-                    {
-                        if (_currentPlayer.GetType() == player1.GetType()) Console.WriteLine("Congratulations! You've settled the ship!!!");
-
-                        else Console.WriteLine("Your ship's been settled.");
-                    }
-                }
-
-                // An option to play without moving the ships.
-                else if (result == HitStatus.Repeat)
-                {
-                    if (_currentPlayer.GetType() == player1.GetType()) Console.WriteLine("This grid has already been hit. Please enter different coordinates.");
-                    continue;
-                }
-                else
-                {
-                    if (_currentPlayer.GetType() == player1.GetType()) Console.WriteLine("You missed.");
-
-                    else Console.WriteLine("Your opponent missed.");
-                }
-
-                if (StartNewGame.CheckTheWinner(_nextPlayer) == true)
-                {
-                    winner = _currentPlayer == player1 ? "Player 1" : "Player 2";
-                }
-
-                //Board.MoveTheShip(numberOfGrids, board, random, _currentPlayer);
+                Board.MoveTheShip(board, random, _currentPlayer);
 
                 _nextPlayer = _currentPlayer;
                 _currentPlayer = _currentPlayer == player1 ? player2 : player1;

@@ -9,266 +9,205 @@ namespace Battleship
 {
     class Board
     {
-        public static bool CheckIfOutOfRange(int shipCoordinateI, int shipCoordinateJ, string[,] board)
+        public static bool CheckIfOutOfRange(int ship_I, int ship_J, string[,] board)
         {
-            return shipCoordinateI > board.GetLength(0) - 1 ||
-                   shipCoordinateJ > board.GetLength(0) - 1 ||
-                   shipCoordinateI < 0 ||
-                   shipCoordinateJ < 0 ? true : false;
+            return ship_I > board.GetLength(0) - 1 ||
+                   ship_J > board.GetLength(0) - 1 ||
+                   ship_I < 0 ||
+                   ship_J < 0 ? true : false;
         }
 
-        public static bool CheckIfOutOfRange(int shipCoordinateI1, int shipCoordinateJ1, int shipCoordinateI2, int shipCoordinateJ2, string[,] board)
+        public static Ship CheckIfHitTheShip(string[,] board, Player currentPlayer, Player nextPlayer)
         {
-            return shipCoordinateI1 > board.GetLength(0) - 1 || shipCoordinateI1 < 0 ||
-                   shipCoordinateJ1 > board.GetLength(0) - 1 || shipCoordinateJ1 < 0 ||
-                   shipCoordinateI2 > board.GetLength(0) - 1 || shipCoordinateI2 < 0 ||
-                   shipCoordinateJ2 > board.GetLength(0) - 1 || shipCoordinateJ2 < 0 ? true : false;
-        }
-
-        public static HitStatus CheckIfHitTheShip(string[,] board, IPlayer currentPlayer, IPlayer nextPlayer)
-        {
-            if (board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] == currentPlayer.symbol1 ||
-                board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] == currentPlayer.symbol2 ||
-                board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] == currentPlayer.symbol3) return HitStatus.Own;
-
-            else if (board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] == nextPlayer.symbol1)
+            foreach (Ship ship in currentPlayer.ships)
             {
-                board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] = GridProperties.X1.ToString();
-                nextPlayer.Ship1Settled += 1;
-                return HitStatus.Hit;
+                if (board[currentPlayer.HitI, currentPlayer.HitJ] == ship.Symbol) return ship;
             }
 
-            else if (board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] == nextPlayer.symbol2)
+            foreach (Ship ship in nextPlayer.ships)
             {
-                board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] = GridProperties.X1.ToString();
-                nextPlayer.Ship2_1_Settled += 1;
-                return HitStatus.HalfHit;
+                if (board[currentPlayer.HitI, currentPlayer.HitJ] == ship.Symbol)
+                {
+                    board[currentPlayer.HitI, currentPlayer.HitJ] = GridProperties.X1.ToString();
+                    ship.Settled = 1;
+                    return ship;
+                }
             }
 
-            else if (board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] == nextPlayer.symbol3)
+            board[currentPlayer.HitI, currentPlayer.HitJ] = GridProperties.O1.ToString();
+            return null;
+        }
+
+        public static bool CheckIfTheGridTaken(List<Ship> ships, string[,] board)
+        {
+            foreach (Ship ship in ships)
             {
-                board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] = GridProperties.X1.ToString();
-                nextPlayer.Ship2_2_Settled += 1;
-                return HitStatus.HalfHit;
+                if (board[ship.I, ship.J].Contains(GridProperties.S.ToString()))
+                return true;
             }
+            return false;
+        }
 
-            // An option to play without moving the ships.
-            else if (board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] == GridProperties.O1.ToString() ||
-                     board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] == GridProperties.X1.ToString()) return HitStatus.Repeat;
+        public static bool CheckIfTheGridTaken(int ship_I, int ship_J, string[,] board)
+        {
+            if (board[ship_I, ship_J].Contains(GridProperties.S.ToString())) return true;
+            return false;
+        }
 
-            else
+        public static void MoveTheShip(string[,] board, Random random, Player currentPlayer)
+        {
+            if (currentPlayer.ships[0].Settled == 0 &&
+                CheckIfMovingPossible(currentPlayer.ships[0], board))
             {
-                board[currentPlayer.HitCoordinateI, currentPlayer.HitCoordinateJ] = GridProperties.O1.ToString();
-                return HitStatus.Missed;
-            }       
-        }
-        
-        public static bool CheckIfTheGridTaken(int shipCoordinateI, int shipCoordinateJ, string[,] board)
-        {
-            return board[shipCoordinateI, shipCoordinateJ] != GridProperties.M1.ToString() &&
-                   board[shipCoordinateI, shipCoordinateJ] != GridProperties.O1.ToString() &&
-                   board[shipCoordinateI, shipCoordinateJ] != GridProperties.X1.ToString() ? true : false;
-        }
+                board[currentPlayer.ships[0].I, currentPlayer.ships[0].J] = currentPlayer.ships[0].OverWrittenSymbol;
 
-        public static bool CheckIfTheGridTaken(int shipCoordinateI1, int shipCoordinateJ1, int shipCoordinateI2, int shipCoordinateJ2, string[,] board)
-        {
-            return board[shipCoordinateI1, shipCoordinateJ1] != GridProperties.M1.ToString() ||
-                   board[shipCoordinateI2, shipCoordinateJ2] != GridProperties.M1.ToString() ? true : false;
-        }
-
-
-        public static void MoveTheShip(int numberOfGrids, string[,] board, Random random, IPlayer currentPlayer)
-        {
-            if (currentPlayer.Ship1Settled == 0 &&
-                CheckIfMovingPossible(currentPlayer.Ship1CoordinateI, currentPlayer.Ship1CoordinateJ, board) == true)
-            {
-                int[] arrayShip1 = new int[2];
-
-                arrayShip1 = MoveOneSectionOfTheShip(currentPlayer.Ship1CoordinateI, 
-                                                     currentPlayer.Ship1CoordinateJ, board, random);
-
-                board[currentPlayer.Ship1CoordinateI, currentPlayer.Ship1CoordinateJ] = currentPlayer.OverWrittenSymmbolShip1;
-
-                currentPlayer.OverWrittenSymmbolShip1 = board[arrayShip1[0], arrayShip1[1]];
-
-                board[arrayShip1[0], arrayShip1[1]] = currentPlayer.symbol1;
-
-                currentPlayer.Ship1CoordinateI = arrayShip1[0];
-                currentPlayer.Ship1CoordinateJ = arrayShip1[1];
+                MoveManagement(currentPlayer.ships[0], board, random);
             }
 
             // The case when neither section of the second ship has been hit.
-            if (currentPlayer.Ship2_1_Settled == 0 && currentPlayer.Ship2_2_Settled == 0 &&
-               (CheckIfMovingPossible(currentPlayer.Ship2CoordinateI1, currentPlayer.Ship2CoordinateJ1, board) == true ||
-                CheckIfMovingPossible(currentPlayer.Ship2CoordinateI2, currentPlayer.Ship2CoordinateJ2, board) == true))
+            if (currentPlayer.ships[1].Settled == 0 && 
+                currentPlayer.ships[2].Settled == 0 &&
+               (CheckIfMovingPossible(currentPlayer.ships[1], board) ||
+                CheckIfMovingPossible(currentPlayer.ships[2], board)))
             {
-                int oldShip2CoordinateI1 = currentPlayer.Ship2CoordinateI1;
-                int oldShip2CoordinateJ1 = currentPlayer.Ship2CoordinateJ1;
+                int oldShip2_I = currentPlayer.ships[1].I;
+                int oldShip2_J = currentPlayer.ships[1].J;
 
-                int[] arrayShip2_1_Case1 = new int[2];
+                board[currentPlayer.ships[1].I, currentPlayer.ships[1].J] = currentPlayer.ships[1].OverWrittenSymbol;
+                board[currentPlayer.ships[2].I, currentPlayer.ships[2].J] = currentPlayer.ships[2].OverWrittenSymbol;
 
-                arrayShip2_1_Case1 = MoveOneSectionOfTheShip(currentPlayer.Ship2CoordinateI1,
-                                                             currentPlayer.Ship2CoordinateJ1,
-                                                             currentPlayer.Ship2CoordinateI2,
-                                                             currentPlayer.Ship2CoordinateJ2, board, random);
-
-                board[currentPlayer.Ship2CoordinateI1, currentPlayer.Ship2CoordinateJ1] = currentPlayer.OverWrittenSymmbolShip2S1;
-                board[currentPlayer.Ship2CoordinateI2, currentPlayer.Ship2CoordinateJ2] = currentPlayer.OverWrittenSymmbolShip2S2;
-
-                currentPlayer.OverWrittenSymmbolShip2S1 = board[arrayShip2_1_Case1[0], arrayShip2_1_Case1[1]];
-
-                board[arrayShip2_1_Case1[0], arrayShip2_1_Case1[1]] = currentPlayer.symbol2;
-
-                currentPlayer.Ship2CoordinateI1 = arrayShip2_1_Case1[0];
-                currentPlayer.Ship2CoordinateJ1 = arrayShip2_1_Case1[1];
+                MoveManagement(currentPlayer.ships[1], board, random);
 
                 // Checking of the first section of the second ship is done.
 
-                if (currentPlayer.Ship2CoordinateI1 != currentPlayer.Ship2CoordinateI2 ||
-                    currentPlayer.Ship2CoordinateJ1 != currentPlayer.Ship2CoordinateJ2)
+                //Need to check if the new condition is fulfilled.
+                if (!currentPlayer.ships[1].Equals(currentPlayer.ships[2]))
                 {
-                    currentPlayer.OverWrittenSymmbolShip2S2 = board[oldShip2CoordinateI1, oldShip2CoordinateJ1];
+                    currentPlayer.ships[2].OverWrittenSymbol = board[oldShip2_I, oldShip2_J];
 
-                    board[oldShip2CoordinateI1, oldShip2CoordinateJ1] = currentPlayer.symbol3;
+                    board[oldShip2_I, oldShip2_J] = currentPlayer.ships[2].Symbol;
 
-                    currentPlayer.Ship2CoordinateI2 = oldShip2CoordinateI1;
-                    currentPlayer.Ship2CoordinateJ2 = oldShip2CoordinateJ1;
+                    currentPlayer.ships[2].I = oldShip2_I;
+                    currentPlayer.ships[2].J = oldShip2_J;
                 }
-                
+
                 else
                 {
-                    int[] arrayShip2_2_Case1 = new int[2];
-
-                    arrayShip2_2_Case1 = MoveOneSectionOfTheShip(currentPlayer.Ship2CoordinateI2,
-                                                                 currentPlayer.Ship2CoordinateJ2,
-                                                                 oldShip2CoordinateI1,
-                                                                 oldShip2CoordinateJ1, board, random);
-
-                    currentPlayer.OverWrittenSymmbolShip2S2 = board[arrayShip2_2_Case1[0], arrayShip2_2_Case1[1]];
-
-                    board[arrayShip2_2_Case1[0], arrayShip2_2_Case1[1]] = currentPlayer.symbol3;
-
-                    currentPlayer.Ship2CoordinateI2 = arrayShip2_2_Case1[0];
-                    currentPlayer.Ship2CoordinateJ2 = arrayShip2_2_Case1[1];
+                    MoveManagement(currentPlayer.ships[2], oldShip2_I, oldShip2_J, board, random);
                 }
             }
 
             // The case when one of the sections of the second ship has been hit.
             else
             {
-                if (currentPlayer.Ship2_1_Settled == 0 &&
-                    CheckIfMovingPossible(currentPlayer.Ship2CoordinateI1, 
-                                          currentPlayer.Ship2CoordinateJ1, board) == true)
+                if (currentPlayer.ships[1].Settled == 0 &&
+                    CheckIfMovingPossible(currentPlayer.ships[1], board))
                 {
-                    int[] arrayShip2_1_Case2 = new int[2];
+                    board[currentPlayer.ships[1].I, currentPlayer.ships[1].J] = currentPlayer.ships[1].OverWrittenSymbol;
 
-                    arrayShip2_1_Case2 = MoveOneSectionOfTheShip(currentPlayer.Ship2CoordinateI1, 
-                                                                 currentPlayer.Ship2CoordinateJ1, board, random);
-
-                    board[currentPlayer.Ship2CoordinateI1, currentPlayer.Ship2CoordinateJ1] = currentPlayer.OverWrittenSymmbolShip2S1;
-
-                    currentPlayer.OverWrittenSymmbolShip2S1 = board[arrayShip2_1_Case2[0], arrayShip2_1_Case2[1]];
-
-                    board[arrayShip2_1_Case2[0], arrayShip2_1_Case2[1]] = currentPlayer.symbol2;
-
-                    currentPlayer.Ship2CoordinateI1 = arrayShip2_1_Case2[0];
-                    currentPlayer.Ship2CoordinateJ1 = arrayShip2_1_Case2[1];
+                    MoveManagement(currentPlayer.ships[1], board, random);
                 }
 
-                else if (currentPlayer.Ship2_2_Settled == 0 &&
-                         CheckIfMovingPossible(currentPlayer.Ship2CoordinateI2, 
-                                               currentPlayer.Ship2CoordinateJ2, board) == true)
+                else if (currentPlayer.ships[2].Settled == 0 &&
+                         CheckIfMovingPossible(currentPlayer.ships[2], board))
                 {
-                    int[] arrayShip2_2_Case2 = new int[2];
+                    board[currentPlayer.ships[2].I, currentPlayer.ships[2].J] = currentPlayer.ships[2].OverWrittenSymbol;
 
-                    arrayShip2_2_Case2 = MoveOneSectionOfTheShip(currentPlayer.Ship2CoordinateI2, 
-                                                                 currentPlayer.Ship2CoordinateJ2, board, random);
-
-                    board[currentPlayer.Ship2CoordinateI2, currentPlayer.Ship2CoordinateJ2] = currentPlayer.OverWrittenSymmbolShip2S2;
-
-                    currentPlayer.OverWrittenSymmbolShip2S2 = board[arrayShip2_2_Case2[0], arrayShip2_2_Case2[1]];
-
-                    board[arrayShip2_2_Case2[0], arrayShip2_2_Case2[1]] = currentPlayer.symbol3;
-
-                    currentPlayer.Ship2CoordinateI2 = arrayShip2_2_Case2[0];
-                    currentPlayer.Ship2CoordinateJ2 = arrayShip2_2_Case2[1];
+                    MoveManagement(currentPlayer.ships[2], board, random);
                 }
             }
         }
-        
-        private static int[] MoveOneSectionOfTheShip(int shipCoordinateI, 
-                                                     int shipCoordinateJ, string[,] board, Random random)
+
+        private static void MoveManagement(Ship ship, string[,] board, Random random)
         {
-            int oldShipCoordinateI = shipCoordinateI;
-            int oldShipCoordinateJ = shipCoordinateJ;
+            int[] arrayShip = new int[2];
+
+            arrayShip = MoveOneSectionOfTheShip(ship, board, random);
+
+            ship.OverWrittenSymbol = board[arrayShip[0], arrayShip[1]];
+
+            board[arrayShip[0], arrayShip[1]] = ship.Symbol;
+
+            ship.I = arrayShip[0];
+            ship.J = arrayShip[1];
+        }
+
+        private static int[] MoveOneSectionOfTheShip(Ship ship, string[,] board, Random random)
+        {
+            int oldShip_I = ship.I;
+            int oldShip_J = ship.J;
 
             while (true)
             {
-                shipCoordinateI = random.Next(oldShipCoordinateI - 1, oldShipCoordinateI + 2);
-                shipCoordinateJ = random.Next(oldShipCoordinateJ - 1, oldShipCoordinateJ + 2);
+                ship.I = random.Next(oldShip_I - 1, oldShip_I + 2);
+                ship.J = random.Next(oldShip_J - 1, oldShip_J + 2);
 
-                if (CheckIfOutOfRange(shipCoordinateI, shipCoordinateJ, board) == true) continue;
+                if (CheckIfOutOfRange(ship.I, ship.J, board)) continue;
 
-                if (CheckIfTheGridTaken(shipCoordinateI, shipCoordinateJ, board) == true) continue;
+                if (CheckIfTheGridTaken(ship.I, ship.J, board)) continue;
 
-                if (Ship.CheckTheSecondGridOfTheShip(oldShipCoordinateI,
-                                                     oldShipCoordinateJ,
-                                                     shipCoordinateI,
-                                                     shipCoordinateJ) == false) continue;
+                if (Ship.CheckTheSecondGridOfTheShip(oldShip_I, oldShip_J, ship.I, ship.J) == false) continue;
                 break;
             }
 
-            int[] array = new int[] { shipCoordinateI, shipCoordinateJ };
+            int[] array = new int[] { ship.I, ship.J };
 
             return array;
         }
 
-        private static int[] MoveOneSectionOfTheShip(int shipCoordinateI, int shipCoordinateJ, 
-                                                     int ship2CoordinateI, int ship2CoordinateJ,  
-                                                     string[,] board, Random random)
+        private static void MoveManagement(Ship ship, int ship2_I, int ship2_J, string[,] board, Random random)
         {
-            int oldShipCoordinateI = shipCoordinateI;
-            int oldShipCoordinateJ = shipCoordinateJ;
+            int[] arrayShip = new int[2];
+
+            arrayShip = MoveOneSectionOfTheShip(ship, ship2_I, ship2_J, board, random);
+
+            ship.OverWrittenSymbol = board[arrayShip[0], arrayShip[1]];
+
+            board[arrayShip[0], arrayShip[1]] = ship.Symbol;
+
+            ship.I = arrayShip[0];
+            ship.J = arrayShip[1];
+        }
+
+        private static int[] MoveOneSectionOfTheShip(Ship ship, int ship2_I, int ship2_J, string[,] board, Random random)
+        {
+            int oldShip_I = ship.I;
+            int oldShip_J = ship.J;
 
             while (true)
             {
-                shipCoordinateI = random.Next(oldShipCoordinateI - 1, oldShipCoordinateI + 2);
-                shipCoordinateJ = random.Next(oldShipCoordinateJ - 1, oldShipCoordinateJ + 2);
+                ship.I = random.Next(oldShip_I - 1, oldShip_I + 2);
+                ship.J = random.Next(oldShip_J - 1, oldShip_J + 2);
 
-                if (CheckIfOutOfRange(shipCoordinateI, shipCoordinateJ, board) == true) continue;
+                if (CheckIfOutOfRange(ship.I, ship.J, board)) continue;
 
-                if (shipCoordinateI == ship2CoordinateI && shipCoordinateJ == ship2CoordinateJ) continue;
+                if (ship.I == ship2_I && ship.J == ship2_J) continue;
 
-                if (CheckIfTheGridTaken(shipCoordinateI, shipCoordinateJ, board) == true) continue;
+                if (CheckIfTheGridTaken(ship.I, ship.J, board)) continue;
 
-                if (Ship.CheckTheSecondGridOfTheShip(oldShipCoordinateI,
-                                                     oldShipCoordinateJ,
-                                                     shipCoordinateI,
-                                                     shipCoordinateJ) == false) continue;
+                if (Ship.CheckTheSecondGridOfTheShip(oldShip_I, oldShip_J, ship.I, ship.J) == false) continue;
                 break;
             }
 
-            int[] array = new int[] { shipCoordinateI, shipCoordinateJ };
+            int[] array = new int[] { ship.I, ship.J };
 
             return array;
         }
 
-        
-        private static bool CheckIfMovingPossible(int ShipCoordinateI, 
-                                                  int ShipCoordinateJ, string[,] board)
+        private static bool CheckIfMovingPossible(Ship ship, string[,] board)
         {
-            int I1 = ShipCoordinateI - 1;
-            int I2 = ShipCoordinateI;
-            int I3 = ShipCoordinateI + 1;
-            int J1 = ShipCoordinateJ - 1;
-            int J2 = ShipCoordinateJ;
-            int J3 = ShipCoordinateJ + 1;
+            int I1 = ship.I - 1;
+            int I2 = ship.I;
+            int I3 = ship.I + 1;
+            int J1 = ship.J - 1;
+            int J2 = ship.J;
+            int J3 = ship.J + 1;
 
-            if (CheckIfOutOfRange(I1, J2, board) == false && CheckIfTheGridTaken(I1, J2, board) == false) return true;
-            if (CheckIfOutOfRange(I2, J3, board) == false && CheckIfTheGridTaken(I2, J3, board) == false) return true;
-            if (CheckIfOutOfRange(I3, J2, board) == false && CheckIfTheGridTaken(I3, J2, board) == false) return true;
-            if (CheckIfOutOfRange(I2, J1, board) == false && CheckIfTheGridTaken(I2, J1, board) == false) return true;
-            else return false;
+            if (CheckIfOutOfRange(I1, J2, board) && CheckIfTheGridTaken(I1, J2, board)) return false;
+            if (CheckIfOutOfRange(I2, J3, board) && CheckIfTheGridTaken(I2, J3, board)) return false;
+            if (CheckIfOutOfRange(I3, J2, board) && CheckIfTheGridTaken(I3, J2, board)) return false;
+            if (CheckIfOutOfRange(I2, J1, board) && CheckIfTheGridTaken(I2, J1, board)) return false;
+            else return true;
         }
     }
 }

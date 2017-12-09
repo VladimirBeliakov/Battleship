@@ -6,64 +6,61 @@ using System.Threading.Tasks;
 
 namespace Battleship
 {
-    class AIPlayer : IPlayer
+    class AIPlayer : Player
     {
-        Random random = new Random();
-
-        public string symbol1 { get; set; }
-        public string symbol2 { get; set; }
-        public string symbol3 { get; set; }
-
-        public int Ship1CoordinateI { get; set; }
-        public int Ship1CoordinateJ { get; set; }
-
-        public int Ship2CoordinateI1 { get; set; }
-        public int Ship2CoordinateJ1 { get; set; }
-        public int Ship2CoordinateI2 { get; set; }
-        public int Ship2CoordinateJ2 { get; set; }
-
-        public int HitCoordinateI { get; set; }
-        public int HitCoordinateJ { get; set; }
-
-        public string OverWrittenSymmbolShip1 { get; set; }
-        public string OverWrittenSymmbolShip2S1 { get; set; }
-        public string OverWrittenSymmbolShip2S2 { get; set; }
+        public int HitI { get; set; }
+        public int HitJ { get; set; }
 
         public int Ship1Settled { get; set; }
-        public int Ship2_1_Settled { get; set; }
-        public int Ship2_2_Settled { get; set; }
+        public int Ship2Settled { get; set; }
+        public int Ship3Settled { get; set; }
 
-        public void PutTheShipOnTheBoard(int numberOfGrids, int number, string[,] board)
+        public List<Ship> ships { get; set; }
+
+        public void InitializeTheShips()
         {
-            Ship1CoordinateI = random.Next(numberOfGrids);
-            Ship1CoordinateJ = random.Next(numberOfGrids);
+            ships = new List<Ship>();
+            ships.Add(new Ship());
+            ships.Add(new Ship());
+            ships.Add(new Ship());
+        }
+
+        public void PutTheShipOnTheBoard(int number, string[,] board)
+        {
+            Random random = new Random();
+
+            ships[0].I = random.Next(board.GetLength(0));
+            ships[0].J = random.Next(board.GetLength(0));
 
             while (true)
             {
-                Ship2CoordinateI1 = random.Next(numberOfGrids);
-                Ship2CoordinateJ1 = random.Next(numberOfGrids);
-                Ship2CoordinateI2 = random.Next(Ship2CoordinateI1 - 1, Ship2CoordinateI1 + 2);
-                Ship2CoordinateJ2 = random.Next(Ship2CoordinateJ1 - 1, Ship2CoordinateJ1 + 2);
+                ships[1].I = random.Next(board.GetLength(0));
+                ships[1].J = random.Next(board.GetLength(0));
+                ships[2].I = random.Next(ships[1].I - 1, ships[1].I + 2);
+                ships[2].J = random.Next(ships[1].J - 1, ships[1].J + 2);
 
-                if (Board.CheckIfOutOfRange(Ship2CoordinateI1, Ship2CoordinateJ1, Ship2CoordinateI2, Ship2CoordinateJ2, board) == true) continue;
+                if (Board.CheckIfOutOfRange(ships[1].I, ships[1].J, board) &&
+                    Board.CheckIfOutOfRange(ships[2].I, ships[2].J, board)) continue;
 
-                if (Ship.CheckTheSecondGridOfTheShip(Ship2CoordinateI1, Ship2CoordinateJ1, Ship2CoordinateI2, Ship2CoordinateJ2) == true) break;
+                if (Ship.CheckTheSecondGridOfTheShip(ships[1].I, ships[1].J, ships[2].I, ships[2].J)) break;
                 else continue;
             }
         }
 
-        public void HitTheBoard(int numberOfGrids, int number, string[,] board)
+        public void HitTheBoard(int number, string[,] board)
         {
+            Random random = new Random();
+
             while (true)
             {
-                HitCoordinateI = random.Next(numberOfGrids);
-                HitCoordinateJ = random.Next(numberOfGrids);
+                HitI = random.Next(board.GetLength(0));
+                HitJ = random.Next(board.GetLength(0));
 
-                if (Board.CheckIfOutOfRange(HitCoordinateI, HitCoordinateJ, board) == false) break;
+                if (Board.CheckIfOutOfRange(HitI, HitJ, board) == false) break;
 
                 else
                 {
-                    Console.WriteLine("The coordinates must be from 0 to {0}", numberOfGrids - 1);
+                    Console.WriteLine("The coordinates must be from 0 to {0}", board.GetLength(0) - 1);
                     Console.WriteLine();
                     continue;
                 }

@@ -10,83 +10,17 @@ namespace Battleship
     {
         static void Main(string[] args)
         {
-            int numberOfGrids = 0;
+            string[,] battleshipBoard = StartNewGame.CreatNewBoard();
 
-            while (true)
-            {
-                try
-                {
-                    Console.WriteLine("To start a new game, enter the number of grids for the board to play on.");
-                    numberOfGrids = Int32.Parse(Console.ReadLine());
+            Player player1 = new RealPlayer();
+            Player player2 = StartNewGame.DefineThePlayer();
 
-                    if (numberOfGrids > 10 || numberOfGrids < 3)
-                    {
-                        Console.WriteLine("The board cannot be bigger than 10x10 or smaller than 3x3. Please enter a new number.");
-                        continue;
-                    }
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine("This is not a valid input.");
-                    continue;
-                }
-                break;
-            }
+            player1.InitializeTheShips();
+            player2.InitializeTheShips();
 
-            string[,] BattleshipBoard = new string[numberOfGrids, numberOfGrids];
+            StartNewGame.AssignPlayers(player1, player2);
 
-            while (true)
-            {
-                Console.WriteLine("Please choose a game mode: for 2 players, enter \"1\", for player vs. AI, enter \"2\".");
-                int input = Int32.Parse(Console.ReadLine());
-
-                try
-                {
-                    if (input == 1)
-                    {
-                        StartNewGame.GameMode = GameScenario.RealVsReal;
-                    }
-                    else if (input == 2)
-                    {
-                        StartNewGame.GameMode = GameScenario.RealVsAI;
-                    }
-                    else
-                    {
-                        Console.WriteLine("You should enter \"1\" or \"2\".");
-                        continue;
-                    }
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine("This is not a valid input.");
-                    continue;
-                }
-                break;
-            }
-
-            Random random = new Random();
-
-            IPlayer player1;
-            IPlayer player2;
-
-            if (StartNewGame.GameMode == GameScenario.RealVsAI)
-            {
-                player1 = new RealPlayer();
-                player2 = new AIPlayer();
-            }
-
-            else
-            {
-                player1 = new RealPlayer();
-                player2 = new RealPlayer();
-            }
-
-            GameVisualisation gameVisualisation = new GameVisualisation();
-            GameEngine gameEngine = new GameEngine(gameVisualisation);
-
-            StartNewGame.NewGame(player1, player2, BattleshipBoard, gameVisualisation);
-
-            string winner = gameEngine.PlayingTheGame(player1, player2, BattleshipBoard, numberOfGrids, random);
+            string winner = GameEngine.PlayingTheGame(player1, player2, battleshipBoard);
 
             Console.WriteLine($"The Winner is {winner}!");
 

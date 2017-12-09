@@ -9,12 +9,7 @@ namespace Battleship
     enum GridProperties
     {
         M1,
-        S1, 
-        S2, 
-        S3, 
-        S4, 
-        S5,
-        S6,
+        S,
         X1,
         O1
     }

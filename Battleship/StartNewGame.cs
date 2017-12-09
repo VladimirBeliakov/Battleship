@@ -10,34 +10,117 @@ namespace Battleship
     {
         public static GameScenario GameMode { get; set; }
 
-        public static void NewGame(IPlayer player1, IPlayer player2, string[,] board, GameVisualisation gameVisualisation)
+        public static string[,] CreatNewBoard()
         {
-            AssignPlayers(player1, player2);
-            Array.Clear(board, 0, board.Length);
-            gameVisualisation.InitializeOrPrintBoard(board, player1, player2);
-            player1.OverWrittenSymmbolShip1 = GridProperties.M1.ToString();
-            player1.OverWrittenSymmbolShip2S1 = GridProperties.M1.ToString();
-            player1.OverWrittenSymmbolShip2S2 = GridProperties.M1.ToString();
-            player2.OverWrittenSymmbolShip1 = GridProperties.M1.ToString();
-            player2.OverWrittenSymmbolShip2S1 = GridProperties.M1.ToString();
-            player2.OverWrittenSymmbolShip2S2 = GridProperties.M1.ToString();
+            int numberOfGrids = ChooseTheBoardSize();
+
+            string[,] board = new string[numberOfGrids, numberOfGrids];
+
+            GameVisualisation.InitializeBoard(board);
+
+            return board;
         }
 
-        public static bool CheckTheWinner(IPlayer nextPlayer)
+        private static int ChooseTheBoardSize()
         {
-            return nextPlayer.Ship1Settled == 1 &&
-                   nextPlayer.Ship2_1_Settled == 1 &&
-                   nextPlayer.Ship2_2_Settled == 1 ? true : false;
+            int numberOfGrids = 0;
+
+            while (true)
+            {
+                try
+                {
+                    Console.WriteLine("To start a new game, enter the number of grids for the board to play on.");
+                    numberOfGrids = Int32.Parse(Console.ReadLine());
+
+                    if (numberOfGrids > 10 || numberOfGrids < 3)
+                    {
+                        Console.WriteLine("The board cannot be bigger than 10x10 or smaller than 3x3. Please enter a new number.");
+                        continue;
+                    }
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("This is not a valid input.");
+                    continue;
+                }
+                break;
+            }
+            return numberOfGrids;
         }
 
-        private static void AssignPlayers(IPlayer player1, IPlayer player2)
+        public static Player DefineThePlayer()
         {
-            player1.symbol1 = GridProperties.S1.ToString();
-            player1.symbol2 = GridProperties.S2.ToString();
-            player1.symbol3 = GridProperties.S3.ToString();
-            player2.symbol1 = GridProperties.S4.ToString();
-            player2.symbol2 = GridProperties.S5.ToString();
-            player2.symbol3 = GridProperties.S6.ToString();
+            Player player;
+
+            ChooseGameMode();
+
+            if (StartNewGame.GameMode == GameScenario.RealVsAI)
+            {
+                player = new AIPlayer();
+            }
+
+            else
+            {
+                player = new RealPlayer();
+            }
+            return player;
         }
+
+        private static void ChooseGameMode()
+        {
+            while (true)
+            {
+                Console.WriteLine("Please choose a game mode: for 2 players, enter \"1\", for player vs. AI, enter \"2\".");
+                int input = Int32.Parse(Console.ReadLine());
+
+                try
+                {
+                    if (input == 1)
+                    {
+                        GameMode = GameScenario.RealVsReal;
+                    }
+                    else if (input == 2)
+                    {
+                        GameMode = GameScenario.RealVsAI;
+                    }
+                    else
+                    {
+                        Console.WriteLine("You should enter \"1\" or \"2\".");
+                        continue;
+                    }
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("This is not a valid input.");
+                    continue;
+                }
+                break;
+            }
+        }
+
+        public  static void AssignPlayers(Player player1, Player player2)
+        {
+            for (int i = 0; i < player1.ships.Count; i++)
+            {
+                player1.ships[i].Symbol = GridProperties.S.ToString() + (i + 1).ToString();
+            }
+
+            for (int i = 0; i < player2.ships.Count; i++)
+            {
+                player2.ships[i].Symbol = GridProperties.S.ToString() + (i + 4).ToString();
+            }
+        }
+
+
+
+
+        public static bool CheckTheWinner(Player nextPlayer)
+        {
+            return nextPlayer.ships[0].Settled == 1 &&
+                   nextPlayer.ships[1].Settled == 1 &&
+                   nextPlayer.ships[2].Settled == 1 ? true : false;
+        }
+
+
     }
 }

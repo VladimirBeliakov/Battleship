@@ -10,7 +10,6 @@ namespace Battleship
     {
         Missed,
         Hit,
-        HalfHit,
         Own,
         Repeat
     }
