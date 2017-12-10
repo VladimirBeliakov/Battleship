@@ -8,6 +8,10 @@ namespace Battleship
 {
     class Ship
     {
+        private static Ship _shipHit;
+        private static Player _currentPlayer;
+        private static Player _nextPlayer;
+
         public int I { get; set; }
         public int J { get; set; }
         public string Symbol { get; set; }
@@ -24,31 +28,58 @@ namespace Battleship
             else return false;
         }
 
-        public static void CheckIfTheShipHit(Player currentPlayer, Player nextPlayer, Ship shipHit, Player player1)
+        public static bool SayWhereThePlayerHit(string[,] board, Player currentPlayer, Player nextPlayer)
         {
-            if (nextPlayer.ships.Contains(shipHit))
+            _currentPlayer = currentPlayer;
+            _nextPlayer = nextPlayer;
+
+            if (currentPlayer.ships.Any(s => s.Symbol == board[currentPlayer.HitI, currentPlayer.HitJ]))
             {
-                if (nextPlayer.ships[0] == shipHit)
+                Console.WriteLine("This is your ship. Please choose different coordinates.");
+                Console.WriteLine();
+                return false;
+            }
+
+            foreach (Ship ship in nextPlayer.ships)
+            {
+                if (board[currentPlayer.HitI, currentPlayer.HitJ] == ship.Symbol)
                 {
-                    if (currentPlayer.GetType() == player1.GetType())
+                    board[currentPlayer.HitI, currentPlayer.HitJ] = GridProperties.X1.ToString();
+                    ship.Settled = 1;
+                    _shipHit = ship;
+                    return true;
+                }
+            }
+
+            board[currentPlayer.HitI, currentPlayer.HitJ] = GridProperties.O1.ToString();
+            return true;
+        }
+
+        public static void SayWhereThePlayerHitInDetails(Player player1)
+        {
+            if (_nextPlayer.ships.Contains(_shipHit))
+            {
+                if (_nextPlayer.ships[0] == _shipHit)
+                {
+                    if (_currentPlayer.GetType() == player1.GetType())
                     Console.WriteLine("Congratulations! You've settled the ship!!!");
 
                     else
                     Console.WriteLine("Your ship's been settled.");
                 }
 
-                else if ((nextPlayer.ships[1] == shipHit || nextPlayer.ships[2] == shipHit))
+                else if ((_nextPlayer.ships[1] == _shipHit || _nextPlayer.ships[2] == _shipHit))
                 {
-                    if (currentPlayer.GetType() == player1.GetType())
+                    if (_currentPlayer.GetType() == player1.GetType())
                     Console.WriteLine("Congratulations! You've hit the ship!!!");
 
                     else
                     Console.WriteLine("Your ship's been hit.");
                 }
 
-                if (nextPlayer.ships[1].Settled == 1 && nextPlayer.ships[2].Settled == 1)
+                if (_nextPlayer.ships[1].Settled == 1 && _nextPlayer.ships[2].Settled == 1)
                 {
-                    if (currentPlayer.GetType() == player1.GetType())
+                    if (_currentPlayer.GetType() == player1.GetType())
                     Console.WriteLine("Congratulations! You've settled the ship!!!");
 
                     else
@@ -65,7 +96,7 @@ namespace Battleship
 
             else
             {
-                if (currentPlayer.GetType() == player1.GetType()) Console.WriteLine("You missed.");
+                if (_currentPlayer.GetType() == player1.GetType()) Console.WriteLine("You missed.");
 
                 else Console.WriteLine("Your opponent missed.");
             }

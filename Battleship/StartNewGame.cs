@@ -89,27 +89,24 @@ namespace Battleship
             }
         }
 
-        public  static void AssignPlayers(Player player1, Player player2)
+        public static void AssignPlayers(Player player1, Player player2)
         {
-            for (int i = 0; i < player1.ships.Count; i++)
-            {
-                player1.ships[i].Symbol = GridProperties.S.ToString() + (i + 1).ToString();
-                player1.ships[i].OverWrittenSymbol = GridProperties.M1.ToString();
-            }
+            AssignPlayersHelper(player1);
+            AssignPlayersHelper(player2);
+        }
 
-            for (int i = 0; i < player2.ships.Count; i++)
+        private static void AssignPlayersHelper(Player player)
+        {
+            for (int i = 0; i < player.ships.Count; i++)
             {
-                player2.ships[i].Symbol = GridProperties.S.ToString() + (i + 4).ToString();
-                player2.ships[i].OverWrittenSymbol = GridProperties.M1.ToString();
+                player.ships[i].Symbol = GridProperties.S.ToString() + (i + 1).ToString();
+                player.ships[i].OverWrittenSymbol = GridProperties.M1.ToString();
             }
         }
 
         public static bool CheckTheWinner(Player nextPlayer)
         {
-            // I need to try the condition like pets.Any(p => p.Age > 1 && p.Vaccinated == false);
-            return nextPlayer.ships[0].Settled == 1 &&
-                   nextPlayer.ships[1].Settled == 1 &&
-                   nextPlayer.ships[2].Settled == 1 ? true : false;
+            return nextPlayer.ships.All(s => s.Settled == 1) ? true : false;
         }
     }
 }

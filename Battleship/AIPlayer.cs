@@ -57,12 +57,7 @@ namespace Battleship
 
                 if (Board.CheckIfOutOfRange(HitI, HitJ, board) == false) break;
 
-                else
-                {
-                    Console.WriteLine("The coordinates must be from 0 to {0}", board.GetLength(0) - 1);
-                    Console.WriteLine();
-                    continue;
-                }
+                else continue;
             }
         }
     }

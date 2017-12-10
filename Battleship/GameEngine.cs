@@ -69,21 +69,10 @@ namespace Battleship
                 GameVisualisation.PrintBoard(board, _currentPlayer, _nextPlayer);
 
                 _currentPlayer.HitTheBoard(number, board);
-       
-                Ship shipHit = Board.CheckIfHitTheShip(board, _currentPlayer, _nextPlayer);
 
-                if (_currentPlayer.ships.Contains(shipHit))
-                {
-                    if (_currentPlayer.GetType() == player1.GetType())
-                    {
-                        Console.WriteLine("This is your ship. Please choose different coordinates.");
-                        Console.WriteLine();
-                    }
+                if (!Ship.SayWhereThePlayerHit(board, _currentPlayer, _nextPlayer)) continue;
 
-                    continue;
-                }
-
-                Ship.CheckIfTheShipHit(_currentPlayer, _nextPlayer, shipHit, player1);
+                Ship.SayWhereThePlayerHitInDetails(player1);
 
                 if (StartNewGame.CheckTheWinner(_nextPlayer)) winner = _currentPlayer == player1 ? "Player 1" : "Player 2";
 
@@ -91,7 +80,6 @@ namespace Battleship
 
                 SwitchPlayers(player1, player2);
             }
-
             return winner;
         }
 

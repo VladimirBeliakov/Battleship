@@ -17,42 +17,14 @@ namespace Battleship
                    ship_J < 0 ? true : false;
         }
 
-        public static Ship CheckIfHitTheShip(string[,] board, Player currentPlayer, Player nextPlayer)
-        {
-            // I may change the condition to Contains().
-            foreach (Ship ship in currentPlayer.ships)
-            {
-                if (board[currentPlayer.HitI, currentPlayer.HitJ] == ship.Symbol) return ship;
-            }
-
-            foreach (Ship ship in nextPlayer.ships)
-            {
-                if (board[currentPlayer.HitI, currentPlayer.HitJ] == ship.Symbol)
-                {
-                    board[currentPlayer.HitI, currentPlayer.HitJ] = GridProperties.X1.ToString();
-                    ship.Settled = 1;
-                    return ship;
-                }
-            }
-
-            board[currentPlayer.HitI, currentPlayer.HitJ] = GridProperties.O1.ToString();
-            return null;
-        }
-
         public static bool CheckIfTheGridTaken(List<Ship> ships, string[,] board)
         {
-            foreach (Ship ship in ships)
-            {
-                if (board[ship.I, ship.J].Contains(GridProperties.S.ToString()))
-                return true;
-            }
-            return false;
+            return ships.Any(s => board[s.I, s.J].Contains(GridProperties.S.ToString())) ? true : false;
         }
 
         public static bool CheckIfTheGridTaken(int ship_I, int ship_J, string[,] board)
         {
-            if (board[ship_I, ship_J].Contains(GridProperties.S.ToString())) return true;
-            return false;
+            return board[ship_I, ship_J].Contains(GridProperties.S.ToString()) ? true : false;
         }
 
         public static void MoveTheShip(string[,] board, Random random, Player currentPlayer)
@@ -65,37 +37,18 @@ namespace Battleship
                 MoveManagement(currentPlayer.ships[0], board, random);
             }
 
+            // I need to come up with a solution for a case when the second section can't move, 
+            // and the first one moves on the second section's grid.
+
             // The case when neither section of the second ship has been hit.
             if (currentPlayer.ships[1].Settled == 0 && 
-                currentPlayer.ships[2].Settled == 0 &&
-               (CheckIfMovingPossible(currentPlayer.ships[1], board) ||
-                CheckIfMovingPossible(currentPlayer.ships[2], board)))
+                currentPlayer.ships[2].Settled == 0)
             {
-                int oldShip2_I = currentPlayer.ships[1].I;
-                int oldShip2_J = currentPlayer.ships[1].J;
+                if (CheckIfMovingPossible(currentPlayer.ships[1], board))
+                ThisSectionGoesFirst(currentPlayer.ships[2], currentPlayer.ships[1], board, random);
 
-                board[currentPlayer.ships[1].I, currentPlayer.ships[1].J] = currentPlayer.ships[1].OverWrittenSymbol;
-                board[currentPlayer.ships[2].I, currentPlayer.ships[2].J] = currentPlayer.ships[2].OverWrittenSymbol;
-
-                MoveManagement(currentPlayer.ships[1], board, random);
-
-                // Checking of the first section of the second ship is done.
-
-                if (!currentPlayer.ships[1].I.Equals(currentPlayer.ships[2].I) &&
-                    !currentPlayer.ships[1].J.Equals(currentPlayer.ships[2].J))
-                {
-                    currentPlayer.ships[2].OverWrittenSymbol = board[oldShip2_I, oldShip2_J];
-
-                    board[oldShip2_I, oldShip2_J] = currentPlayer.ships[2].Symbol;
-
-                    currentPlayer.ships[2].I = oldShip2_I;
-                    currentPlayer.ships[2].J = oldShip2_J;
-                }
-
-                else
-                {
-                    MoveManagement(currentPlayer.ships[2], oldShip2_I, oldShip2_J, board, random);
-                }
+                else if (CheckIfMovingPossible(currentPlayer.ships[2], board))
+                ThisSectionGoesFirst(currentPlayer.ships[1], currentPlayer.ships[2], board, random);
             }
 
             // The case when one of the sections of the second ship has been hit.
@@ -154,6 +107,35 @@ namespace Battleship
             int[] array = new int[] { ship.I, ship.J };
 
             return array;
+        }
+
+        private static void ThisSectionGoesFirst(Ship sectionThatGoesFirst, Ship sectionThatGoesSecond, string [,] board, Random random)
+        {
+            int oldShip2_I = sectionThatGoesFirst.I;
+            int oldShip2_J = sectionThatGoesFirst.J;
+
+            board[sectionThatGoesFirst.I, sectionThatGoesFirst.J] = sectionThatGoesFirst.OverWrittenSymbol;
+            board[sectionThatGoesSecond.I, sectionThatGoesSecond.J] = sectionThatGoesSecond.OverWrittenSymbol;
+
+            MoveManagement(sectionThatGoesFirst, board, random);
+
+            // Checking of the first section of the second ship is done.
+
+            if (!sectionThatGoesFirst.I.Equals(sectionThatGoesSecond.I) ||
+                !sectionThatGoesFirst.J.Equals(sectionThatGoesSecond.J))
+            {
+                sectionThatGoesSecond.OverWrittenSymbol = board[oldShip2_I, oldShip2_J];
+
+                board[oldShip2_I, oldShip2_J] = sectionThatGoesSecond.Symbol;
+
+                sectionThatGoesSecond.I = oldShip2_I;
+                sectionThatGoesSecond.J = oldShip2_J;
+            }
+
+            else
+            {
+                MoveManagement(sectionThatGoesSecond, oldShip2_I, oldShip2_J, board, random);
+            }
         }
 
         private static void MoveManagement(Ship ship, int ship2_I, int ship2_J, string[,] board, Random random)
