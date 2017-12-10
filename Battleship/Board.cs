@@ -19,6 +19,7 @@ namespace Battleship
 
         public static Ship CheckIfHitTheShip(string[,] board, Player currentPlayer, Player nextPlayer)
         {
+            // I may change the condition to Contains().
             foreach (Ship ship in currentPlayer.ships)
             {
                 if (board[currentPlayer.HitI, currentPlayer.HitJ] == ship.Symbol) return ship;
@@ -80,8 +81,8 @@ namespace Battleship
 
                 // Checking of the first section of the second ship is done.
 
-                //Need to check if the new condition is fulfilled.
-                if (!currentPlayer.ships[1].Equals(currentPlayer.ships[2]))
+                if (!currentPlayer.ships[1].I.Equals(currentPlayer.ships[2].I) &&
+                    !currentPlayer.ships[1].J.Equals(currentPlayer.ships[2].J))
                 {
                     currentPlayer.ships[2].OverWrittenSymbol = board[oldShip2_I, oldShip2_J];
 
@@ -203,11 +204,11 @@ namespace Battleship
             int J2 = ship.J;
             int J3 = ship.J + 1;
 
-            if (CheckIfOutOfRange(I1, J2, board) && CheckIfTheGridTaken(I1, J2, board)) return false;
-            if (CheckIfOutOfRange(I2, J3, board) && CheckIfTheGridTaken(I2, J3, board)) return false;
-            if (CheckIfOutOfRange(I3, J2, board) && CheckIfTheGridTaken(I3, J2, board)) return false;
-            if (CheckIfOutOfRange(I2, J1, board) && CheckIfTheGridTaken(I2, J1, board)) return false;
-            else return true;
+            if (CheckIfOutOfRange(I1, J2, board) == false && CheckIfTheGridTaken(I1, J2, board) == false) return true;
+            if (CheckIfOutOfRange(I2, J3, board) == false && CheckIfTheGridTaken(I2, J3, board) == false) return true;
+            if (CheckIfOutOfRange(I3, J2, board) == false && CheckIfTheGridTaken(I3, J2, board) == false) return true;
+            if (CheckIfOutOfRange(I2, J1, board) == false && CheckIfTheGridTaken(I2, J1, board) == false) return true;
+            else return false;
         }
     }
 }

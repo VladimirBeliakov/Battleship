@@ -14,7 +14,6 @@ namespace Battleship
         public string OverWrittenSymbol { get; set; }
         public int Settled { get; set; }
 
-
         public static bool CheckTheSecondGridOfTheShip(int Ship_I1, int Ship_J1, int Ship_I2, int Ship_J2)
         {
             if (Ship_I1 == Ship_I2 && Ship_J1 - 1 == Ship_J2 ||
@@ -25,11 +24,11 @@ namespace Battleship
             else return false;
         }
 
-        public static void AnalyseTheResult(Player currentPlayer, Player nextPlayer, Ship result, Player player1)
+        public static void CheckIfTheShipHit(Player currentPlayer, Player nextPlayer, Ship shipHit, Player player1)
         {
-            if (nextPlayer.ships.Contains(result))
+            if (nextPlayer.ships.Contains(shipHit))
             {
-                if (nextPlayer.ships[0] == result)
+                if (nextPlayer.ships[0] == shipHit)
                 {
                     if (currentPlayer.GetType() == player1.GetType())
                     Console.WriteLine("Congratulations! You've settled the ship!!!");
@@ -38,7 +37,7 @@ namespace Battleship
                     Console.WriteLine("Your ship's been settled.");
                 }
 
-                if ((nextPlayer.ships[1] == result || nextPlayer.ships[2] == result))
+                else if ((nextPlayer.ships[1] == shipHit || nextPlayer.ships[2] == shipHit))
                 {
                     if (currentPlayer.GetType() == player1.GetType())
                     Console.WriteLine("Congratulations! You've hit the ship!!!");
@@ -62,13 +61,13 @@ namespace Battleship
                 //    if (currentPlayer.GetType() == player1.GetType()) Console.WriteLine("This grid has already been hit. Please enter different coordinates.");
                 //    continue;
                 //}
+            }
 
-                else
-                {
-                    if (currentPlayer.GetType() == player1.GetType()) Console.WriteLine("You missed.");
+            else
+            {
+                if (currentPlayer.GetType() == player1.GetType()) Console.WriteLine("You missed.");
 
-                    else Console.WriteLine("Your opponent missed.");
-                }
+                else Console.WriteLine("Your opponent missed.");
             }
         }
     }

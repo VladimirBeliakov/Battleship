@@ -38,7 +38,8 @@ namespace Battleship
                 if (number == 2 && (Board.CheckIfTheGridTaken(_currentPlayer.ships, board)))
                 {
                     Console.WriteLine("The ships are on the same grid. Please enter the coordinates again.");
-                    StartNewGame.CreateNewPlayers(player1, player2);
+                    Console.WriteLine();
+                    GameVisualisation.InitializeBoard(board);
                     _currentPlayer = player1;
                     _nextPlayer = player2;
                     continue;
@@ -49,9 +50,8 @@ namespace Battleship
                     board[ship.I, ship.J] = ship.Symbol;
                 }
 
-                _nextPlayer = _currentPlayer;
-                _currentPlayer = _currentPlayer == player1 ? player2 : player1;
-   
+                SwitchPlayers(player1, player2);
+
                 number++;
             }
 
@@ -70,30 +70,35 @@ namespace Battleship
 
                 _currentPlayer.HitTheBoard(number, board);
        
-                Ship result = Board.CheckIfHitTheShip(board, _currentPlayer, _nextPlayer);
+                Ship shipHit = Board.CheckIfHitTheShip(board, _currentPlayer, _nextPlayer);
 
-                if (_currentPlayer.ships.Contains(result))
+                if (_currentPlayer.ships.Contains(shipHit))
                 {
                     if (_currentPlayer.GetType() == player1.GetType())
                     {
                         Console.WriteLine("This is your ship. Please choose different coordinates.");
                         Console.WriteLine();
                     }
-                    //I need to check if continue works at any case.
+
                     continue;
                 }
 
-                Ship.AnalyseTheResult(_currentPlayer, _nextPlayer, result, player1);
+                Ship.CheckIfTheShipHit(_currentPlayer, _nextPlayer, shipHit, player1);
 
                 if (StartNewGame.CheckTheWinner(_nextPlayer)) winner = _currentPlayer == player1 ? "Player 1" : "Player 2";
 
                 Board.MoveTheShip(board, random, _currentPlayer);
 
-                _nextPlayer = _currentPlayer;
-                _currentPlayer = _currentPlayer == player1 ? player2 : player1;
+                SwitchPlayers(player1, player2);
             }
 
             return winner;
+        }
+
+        private static void SwitchPlayers(Player player1, Player player2)
+        {
+            _nextPlayer = _currentPlayer;
+            _currentPlayer = _currentPlayer == player1 ? player2 : player1;
         }
     }
 }

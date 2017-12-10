@@ -11,15 +11,10 @@ namespace Battleship
         public int HitI { get; set; }
         public int HitJ { get; set; }
 
-        public int Ship1Settled { get; set; }
-        public int Ship2Settled { get; set; }
-        public int Ship3Settled { get; set; }
-
-        public List<Ship> ships { get; set; }
+        public List<Ship> ships { get; set; } = new List<Ship>();
 
         public void InitializeTheShips()
         {
-            ships = new List<Ship>();
             ships.Add(new Ship());
             ships.Add(new Ship());
             ships.Add(new Ship());
@@ -39,10 +34,14 @@ namespace Battleship
                 ships[2].I = random.Next(ships[1].I - 1, ships[1].I + 2);
                 ships[2].J = random.Next(ships[1].J - 1, ships[1].J + 2);
 
-                if (Board.CheckIfOutOfRange(ships[1].I, ships[1].J, board) &&
+                if (ships[0].I == ships[1].I && ships[0].J == ships[1].J ||
+                    ships[0].I == ships[2].I && ships[0].J == ships[2].J) continue;
+
+                if (Board.CheckIfOutOfRange(ships[1].I, ships[1].J, board) ||
                     Board.CheckIfOutOfRange(ships[2].I, ships[2].J, board)) continue;
 
                 if (Ship.CheckTheSecondGridOfTheShip(ships[1].I, ships[1].J, ships[2].I, ships[2].J)) break;
+
                 else continue;
             }
         }

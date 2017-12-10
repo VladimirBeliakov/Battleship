@@ -11,15 +11,10 @@ namespace Battleship
         public int HitI { get; set; }
         public int HitJ { get; set; }
 
-        public int Ship1Settled { get; set; }
-        public int Ship2Settled { get; set; }
-        public int Ship3Settled { get; set; }
-
-        public List<Ship> ships { get; set; }
+        public List<Ship> ships { get; set; } = new List<Ship>();
 
         public void InitializeTheShips()
         {
-            ships = new List<Ship>();
             ships.Add(new Ship());
             ships.Add(new Ship());
             ships.Add(new Ship());

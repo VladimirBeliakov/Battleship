@@ -10,8 +10,6 @@ namespace Battleship
     {
         public static void InitializeBoard(string[,] board)
         {
-            Array.Clear(board, 0, board.Length);
-
             for (int i = 0; i < board.GetLength(0); i++)
             {
                 for (int j = 0; j < board.GetLength(0); j++)
