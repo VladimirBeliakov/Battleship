@@ -28,15 +28,18 @@ namespace Battleship
             else return false;
         }
 
-        public static bool SayWhereThePlayerHit(string[,] board, Player currentPlayer, Player nextPlayer)
+        public static bool SayWhereThePlayerHit(string[,] board, Player currentPlayer, Player nextPlayer, Player player1)
         {
             _currentPlayer = currentPlayer;
             _nextPlayer = nextPlayer;
 
             if (currentPlayer.ships.Any(s => s.Symbol == board[currentPlayer.HitI, currentPlayer.HitJ]))
             {
-                Console.WriteLine("This is your ship. Please choose different coordinates.");
-                Console.WriteLine();
+                if (_currentPlayer.GetType() == player1.GetType())
+                {
+                    Console.WriteLine("This is your ship. Please choose different coordinates.");
+                    Console.WriteLine();
+                }
                 return false;
             }
 
@@ -52,6 +55,7 @@ namespace Battleship
             }
 
             board[currentPlayer.HitI, currentPlayer.HitJ] = GridProperties.O1.ToString();
+            _shipHit = null;
             return true;
         }
 
@@ -75,17 +79,16 @@ namespace Battleship
 
                     else
                     Console.WriteLine("Your ship's been hit.");
+
+                    if (_nextPlayer.ships[1].Settled == 1 && _nextPlayer.ships[2].Settled == 1)
+                    {
+                        if (_currentPlayer.GetType() == player1.GetType())
+                            Console.WriteLine("Congratulations! You've settled the ship!!!");
+
+                        else
+                            Console.WriteLine("Your ship's been settled.");
+                    }
                 }
-
-                if (_nextPlayer.ships[1].Settled == 1 && _nextPlayer.ships[2].Settled == 1)
-                {
-                    if (_currentPlayer.GetType() == player1.GetType())
-                    Console.WriteLine("Congratulations! You've settled the ship!!!");
-
-                    else
-                    Console.WriteLine("Your ship's been settled.");
-                }
-
                 // An option to play without moving the ships.
                 //else if (result == HitStatus.Repeat)
                 //{

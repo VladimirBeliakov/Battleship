@@ -27,8 +27,10 @@ namespace Battleship
             return board[ship_I, ship_J].Contains(GridProperties.S.ToString()) ? true : false;
         }
 
-        public static void MoveTheShip(string[,] board, Random random, Player currentPlayer)
+        public static void MoveTheShip(string[,] board, Player currentPlayer)
         {
+            Random random = new Random();
+
             if (currentPlayer.ships[0].Settled == 0 &&
                 CheckIfMovingPossible(currentPlayer.ships[0], board))
             {

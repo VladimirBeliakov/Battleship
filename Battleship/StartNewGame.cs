@@ -80,6 +80,7 @@ namespace Battleship
                         continue;
                     }
                 }
+
                 catch (Exception)
                 {
                     Console.WriteLine("This is not a valid input.");
@@ -91,16 +92,15 @@ namespace Battleship
 
         public static void AssignPlayers(Player player1, Player player2)
         {
-            AssignPlayersHelper(player1);
-            AssignPlayersHelper(player2);
-        }
-
-        private static void AssignPlayersHelper(Player player)
-        {
-            for (int i = 0; i < player.ships.Count; i++)
+            for (int i = 0; i < player1.ships.Count; i++)
             {
-                player.ships[i].Symbol = GridProperties.S.ToString() + (i + 1).ToString();
-                player.ships[i].OverWrittenSymbol = GridProperties.M1.ToString();
+                player1.ships[i].Symbol = GridProperties.S.ToString() + (i + 1).ToString();
+                player1.ships[i].OverWrittenSymbol = GridProperties.M1.ToString();
+            }
+            for (int i = 0; i < player2.ships.Count; i++)
+            {
+                player2.ships[i].Symbol = GridProperties.S.ToString() + (i + 4).ToString();
+                player2.ships[i].OverWrittenSymbol = GridProperties.M1.ToString();
             }
         }
 

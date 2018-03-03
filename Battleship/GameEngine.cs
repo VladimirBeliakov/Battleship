@@ -13,8 +13,6 @@ namespace Battleship
 
         public static string PlayingTheGame(Player player1, Player player2, string[,] board)
         {
-            Random random = new Random();
-
             int number = 0;
 
             _currentPlayer = player1;
@@ -70,13 +68,13 @@ namespace Battleship
 
                 _currentPlayer.HitTheBoard(number, board);
 
-                if (!Ship.SayWhereThePlayerHit(board, _currentPlayer, _nextPlayer)) continue;
+                if (!Ship.SayWhereThePlayerHit(board, _currentPlayer, _nextPlayer, player1)) continue;
 
                 Ship.SayWhereThePlayerHitInDetails(player1);
 
                 if (StartNewGame.CheckTheWinner(_nextPlayer)) winner = _currentPlayer == player1 ? "Player 1" : "Player 2";
 
-                Board.MoveTheShip(board, random, _currentPlayer);
+                Board.MoveTheShip(board, _currentPlayer);
 
                 SwitchPlayers(player1, player2);
             }

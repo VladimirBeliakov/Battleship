@@ -13,6 +13,8 @@ namespace Battleship
 
         public List<Ship> ships { get; set; } = new List<Ship>();
 
+        Random random = new Random();
+
         public void InitializeTheShips()
         {
             ships.Add(new Ship());
@@ -22,7 +24,6 @@ namespace Battleship
 
         public void PutTheShipOnTheBoard(int number, string[,] board)
         {
-            Random random = new Random();
 
             ships[0].I = random.Next(board.GetLength(0));
             ships[0].J = random.Next(board.GetLength(0));
@@ -40,24 +41,22 @@ namespace Battleship
                 if (Board.CheckIfOutOfRange(ships[1].I, ships[1].J, board) ||
                     Board.CheckIfOutOfRange(ships[2].I, ships[2].J, board)) continue;
 
-                if (Ship.CheckTheSecondGridOfTheShip(ships[1].I, ships[1].J, ships[2].I, ships[2].J)) break;
+                if (!Ship.CheckTheSecondGridOfTheShip(ships[1].I, ships[1].J, ships[2].I, ships[2].J)) continue;
 
-                else continue;
+                else break;
             }
         }
 
         public void HitTheBoard(int number, string[,] board)
         {
-            Random random = new Random();
-
             while (true)
             {
                 HitI = random.Next(board.GetLength(0));
                 HitJ = random.Next(board.GetLength(0));
 
-                if (Board.CheckIfOutOfRange(HitI, HitJ, board) == false) break;
+                if (Board.CheckIfOutOfRange(HitI, HitJ, board)) continue;
 
-                else continue;
+                else break;
             }
         }
     }

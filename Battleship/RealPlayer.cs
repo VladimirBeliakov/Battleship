@@ -99,10 +99,10 @@ namespace Battleship
             {
                 try
                 {
-                    Console.WriteLine("Player {1}, pleast enter a vertical coordinate from 0 to {0} to hit the board.", board.GetLength(0) - 1, number);
+                    Console.WriteLine("Player {1}, please enter a vertical coordinate from 0 to {0} to hit the board.", board.GetLength(0) - 1, number);
                     HitI = Int32.Parse(Console.ReadLine());
 
-                    Console.WriteLine("Player {1}, pleast enter a horizontal coordinate from 0 to {0} to hit the board.", board.GetLength(0) - 1, number);
+                    Console.WriteLine("Player {1}, please enter a horizontal coordinate from 0 to {0} to hit the board.", board.GetLength(0) - 1, number);
                     HitJ = Int32.Parse(Console.ReadLine());
                 }
                 catch (Exception)
